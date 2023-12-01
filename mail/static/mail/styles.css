@@ -1,0 +1,38 @@
+textarea {
+    min-height: 400px;
+}
+
+@keyframes shrink {
+    0% {
+        opacity: 1;
+        font-size: 16px;
+        padding: 12px;
+        margin-bottom: 10px;
+        
+    }
+    70% {
+        opacity: 1;
+        font-size: 16px;
+        padding: 12px;
+        margin-bottom: 10px;
+        
+    }
+    80% {
+        opacity: 0;
+        font-size: 16px;
+        padding: 12px;
+        margin-bottom: 10px;
+    }
+    100% {
+        opacity: 0;
+        font-size: 0px;
+        padding: 0px;
+        margin-bottom: 0px;
+    }
+}
+
+.shrink {
+    animation-name: shrink;
+    animation-duration: 3s;
+    animation-fill-mode: forwards;
+}

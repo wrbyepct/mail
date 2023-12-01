@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "mail"
+version = "0.1.0"
+description = ""
+authors = ["Furthermore <wrbyepcr11@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+django = "^4.2.7"
+livereload = "^2.6.3"
+django-livereload-server = "^0.4"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
