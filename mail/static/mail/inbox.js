@@ -93,6 +93,40 @@ function load_mailbox(mailbox) {
 
   // Show the mailbox name
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
-
+  get_mails(mailbox);
   
+}
+
+function get_mails(mailbox) {
+  
+  fetch(`/emails/${mailbox}`)
+  .then(response => response.json())
+  .then(mails => {
+    displayMails(mails);
+  }) 
+  .catch(error => console.error(error))
+}
+
+function displayMails(mails) {
+
+  const emailsView = document.getElementById('emails-view')
+
+  mails.forEach(mail => {
+
+    const mailContainer = document.createElement('div');
+    const senderTag = document.createElement('strong');
+    const subjectTag = document.createElement('span');
+    const timestampTag = document.createElement('span');
+    timestampTag.classList.add('fw-lighter');
+
+    senderTag.innerHTML = mail.sender;
+    subjectTag.innerHTML = mail.subject;
+    timestampTag.innerHTML = mail.timestamp;
+
+    mailContainer.append(senderTag, subjectTag, timestampTag);
+    // TODO mailContainer css
+
+    emailsView.append(mailContainer);
+
+  })
 }
