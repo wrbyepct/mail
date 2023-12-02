@@ -15,6 +15,7 @@ function compose_email() {
 
   // Show compose view and hide other views
   document.querySelector('#emails-view').style.display = 'none';
+  document.querySelector('#open-mail-view').style.display = 'none';
   document.querySelector('#compose-view').style.display = 'block';
 
   // Clear out composition fields
@@ -26,6 +27,53 @@ function compose_email() {
   document.querySelector('#submit-compose').addEventListener('click', (event) => post_compose(event));
 }
 
+function load_mailbox(mailbox) {
+  
+  // Show the mailbox and hide other views
+  document.querySelector('#emails-view').style.display = 'block';
+  document.querySelector('#compose-view').style.display = 'none';
+  document.querySelector('#open-mail-view').style.display = 'none';
+
+  // Create table for mails 
+  const mailsTable = document.createElement('table')
+  mailsTable.classList.add('table', 'table-hover')
+  const mailsTbody = document.createElement('tbody')
+  mailsTable.append(mailsTbody)
+
+  const emailsView = document.getElementById('emails-view');
+
+  // Show the mailbox name
+  emailsView.innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
+
+  // Add mailsTable to emails view
+  emailsView.append(mailsTable);
+
+  getMailsFromBackendAndDisplayThem(mailbox);
+
+
+  
+}
+
+function openMail() {
+  
+  const emailId = this.dataset.mailid;
+  fetch(`/emails/${emailId}`)
+  .then(response => response.json())
+  .then(result => {
+    if (result.error) {
+      // Access the main container view 
+      const mainContainer = $(this).parents().eq(2);
+      createAlertMessage('alert-danger', mainContainer, result.error);
+    } else {
+       // Hide the other views and show open mail view 
+      document.querySelector('#emails-view').style.display = 'none';
+      document.querySelector('#compose-view').style.display = 'none';
+      document.querySelector('#open-mail-view').style.display = 'block';
+      console.log(result)
+    }
+  })
+  
+}
 
 function post_compose(event) {
 
@@ -51,14 +99,16 @@ function post_compose(event) {
     if (result.error) {
 
       // Create a alert message element
-      createAlertMessage('alert-danger', 'compose-view', result.error)
+      const composeView = document.getElementById('compose-view');
+      createAlertMessage('alert-danger', composeView, result.error);
       
     } else {
 
       load_mailbox('sent');
 
       // Create a alert message element
-      createAlertMessage('alert-success', 'emails-view', result.message)
+      const emailsView = document.getElementById('emails-view');
+      createAlertMessage('alert-success', emailsView, result.message)
 
     }
   })
@@ -81,34 +131,11 @@ function createAlertMessage(alertType, parentElement, message) {
   })
 
   // Place it at the top of the view div
-  document.getElementById(parentElement).prepend(alertMessage)
+  parentElement.prepend(alertMessage)
 }
 
 
-function load_mailbox(mailbox) {
-  
-  // Show the mailbox and hide other views
-  document.querySelector('#emails-view').style.display = 'block';
-  document.querySelector('#compose-view').style.display = 'none';
 
-  // Create table for mails 
-  const mailsTable = document.createElement('table')
-  mailsTable.classList.add('table', 'table-hover')
-
-  const mailsTbody = document.createElement('tbody')
-  mailsTable.append(mailsTbody)
-
-  const emailsView = document.getElementById('emails-view');
-
-  // Show the mailbox name
-  emailsView.innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
-
-  // Add mailsTable to emails view
-  emailsView.append(mailsTable);
-
-  getMailsFromBackendAndDisplayThem(mailbox);
-  
-}
 
 function getMailsFromBackendAndDisplayThem(mailbox) {
   
@@ -127,6 +154,9 @@ function displayMails(mails) {
   mails.forEach(mail => {
 
     mailContainer = createMailContainer(mail)
+
+    // Add mail clicking event listener to them
+    mailContainer.addEventListener('click', openMail)
 
     mailsTbody.append(mailContainer);
 
@@ -156,10 +186,14 @@ function createMailContainer(mail) {
   timestampTag.innerHTML = mail.timestamp;
   mailContainer.append(leftInfo, timestampTag);
 
+  // Attach email id 
+  mailContainer.setAttribute('data-mailid', mail.id)
+
   // Style for mailbox
   mailContainer.classList.add('d-flex', 'justify-content-between', 'p-2', 'border', 'border-dark');
   mailContainer.setAttribute('style', 'cursor: pointer;')
-  if (mail.read) mailContainer.classList.add('bg-secondary');
+  if (mail.read) mailContainer.setAttribute('style', 'background: #D3D3D3; cursor: pointer;')
 
   return mailContainer
 }
+
