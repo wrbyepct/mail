@@ -51,14 +51,14 @@ function post_compose(event) {
     if (result.error) {
 
       // Create a alert message element
-      create_alert_message('alert-danger', 'compose-view', result.error)
+      createAlertMessage('alert-danger', 'compose-view', result.error)
       
     } else {
 
       load_mailbox('sent');
 
       // Create a alert message element
-      create_alert_message('alert-success', 'emails-view', result.message)
+      createAlertMessage('alert-success', 'emails-view', result.message)
 
     }
   })
@@ -66,7 +66,7 @@ function post_compose(event) {
 }
 
 
-function create_alert_message(alertType, parentElement, message) {
+function createAlertMessage(alertType, parentElement, message) {
   // Create a alert message element
   const alertMessage = document.createElement('div');
   alertMessage.classList.add('alert', alertType, 'rounded-0', 'shrink');
@@ -93,11 +93,12 @@ function load_mailbox(mailbox) {
 
   // Show the mailbox name
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
-  get_mails(mailbox);
+  getMailsFromBackendAndDisplayThem(mailbox);
+  
   
 }
 
-function get_mails(mailbox) {
+function getMailsFromBackendAndDisplayThem(mailbox) {
   
   fetch(`/emails/${mailbox}`)
   .then(response => response.json())
@@ -113,20 +114,37 @@ function displayMails(mails) {
 
   mails.forEach(mail => {
 
-    const mailContainer = document.createElement('div');
-    const senderTag = document.createElement('strong');
-    const subjectTag = document.createElement('span');
-    const timestampTag = document.createElement('span');
-    timestampTag.classList.add('fw-lighter');
-
-    senderTag.innerHTML = mail.sender;
-    subjectTag.innerHTML = mail.subject;
-    timestampTag.innerHTML = mail.timestamp;
-
-    mailContainer.append(senderTag, subjectTag, timestampTag);
-    // TODO mailContainer css
-
+    mailContainer = createMailContainer(mail)
+    // Append mailbox to view
     emailsView.append(mailContainer);
 
   })
+}
+
+// Create main container and fill in the values and styles
+function createMailContainer(mail) {
+  // Create container elements, mailbox and left info
+  const mailContainer = document.createElement('div');
+  const leftInfo = document.createElement('div');
+
+  // Left info in mailbox
+  const senderTag = document.createElement('strong');
+  const subjectTag = document.createElement('span');
+  subjectTag.classList.add('pl-3');
+  leftInfo.append(senderTag, subjectTag);
+  
+  // timestamp right info
+  const timestampTag = document.createElement('span');
+  timestampTag.classList.add('text-muted');
+
+  // fill in the value 
+  senderTag.innerHTML = mail.sender;
+  subjectTag.innerHTML = mail.subject;
+  timestampTag.innerHTML = mail.timestamp;
+
+  // Style for mailbox
+  mailContainer.append(leftInfo, timestampTag);
+  mailContainer.classList.add('d-flex', 'justify-content-between', 'p-2', 'border', 'border-dark');
+
+  return mailContainer
 }
