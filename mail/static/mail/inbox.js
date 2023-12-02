@@ -54,6 +54,7 @@ function load_mailbox(mailbox) {
   
 }
 
+// Fetch the mail clicked from the backend
 function openMail() {
   
   const emailId = this.dataset.mailid;
@@ -61,18 +62,71 @@ function openMail() {
   .then(response => response.json())
   .then(result => {
     if (result.error) {
+
       // Access the main container view 
       const mainContainer = $(this).parents().eq(2);
       createAlertMessage('alert-danger', mainContainer, result.error);
+
     } else {
+
        // Hide the other views and show open mail view 
       document.querySelector('#emails-view').style.display = 'none';
       document.querySelector('#compose-view').style.display = 'none';
       document.querySelector('#open-mail-view').style.display = 'block';
-      console.log(result)
+      
+      displayMail(result);
     }
   })
   
+}
+
+function displayMail(mail) {
+
+  const mailContainer = document.createElement('div');
+
+  const mailInfo = {
+    'sender': 'From: ',
+    'recipients': 'To: ',
+    'subject': 'Subject: ',
+    'timestamp': 'Timestamp: '
+  }
+
+  // Attach each row of info: From, To, Subject, Timestamp
+  Object.entries(mailInfo).forEach(([key, title]) => {
+
+      const infoRow = document.createElement('div')
+      const boldTitle = document.createElement('strong');
+      const infoTag = document.createElement('span');
+
+      boldTitle.innerHTML = title;
+
+      if (key === 'recipients') {
+        const recipients = mail[key].join(', ');
+        infoTag.innerHTML = recipients;
+      }
+      else 
+        infoTag.innerHTML = mail[key];
+
+      infoRow.append(boldTitle, infoTag);
+      mailContainer.append(infoRow);
+  })
+
+  // Attach reply button 
+  const replyBtn = document.createElement('button');
+  replyBtn.innerHTML = 'Reply';
+  replyBtn.classList.add('btn', 'btn-outline-primary');
+  mailContainer.append(replyBtn);
+
+  // Attach break line 
+  mailContainer.append(document.createElement('hr'));
+
+  // Attach content body 
+  mailContainer.append(mail.body);
+
+  // Attch to open mail view 
+  const openMailView = document.getElementById('open-mail-view');
+  openMailView.replaceChild(mailContainer, openMailView.firstChild);
+
 }
 
 function post_compose(event) {
@@ -133,8 +187,6 @@ function createAlertMessage(alertType, parentElement, message) {
   // Place it at the top of the view div
   parentElement.prepend(alertMessage)
 }
-
-
 
 
 function getMailsFromBackendAndDisplayThem(mailbox) {
