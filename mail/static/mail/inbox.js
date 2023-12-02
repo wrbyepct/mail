@@ -80,7 +80,7 @@ function createAlertMessage(alertType, parentElement, message) {
     this.remove();
   })
 
-  // Place it at the top of the div
+  // Place it at the top of the view div
   document.getElementById(parentElement).prepend(alertMessage)
 }
 
@@ -91,10 +91,22 @@ function load_mailbox(mailbox) {
   document.querySelector('#emails-view').style.display = 'block';
   document.querySelector('#compose-view').style.display = 'none';
 
+  // Create table for mails 
+  const mailsTable = document.createElement('table')
+  mailsTable.classList.add('table', 'table-hover')
+
+  const mailsTbody = document.createElement('tbody')
+  mailsTable.append(mailsTbody)
+
+  const emailsView = document.getElementById('emails-view');
+
   // Show the mailbox name
-  document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
+  emailsView.innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
+
+  // Add mailsTable to emails view
+  emailsView.append(mailsTable);
+
   getMailsFromBackendAndDisplayThem(mailbox);
-  
   
 }
 
@@ -110,24 +122,25 @@ function getMailsFromBackendAndDisplayThem(mailbox) {
 
 function displayMails(mails) {
 
-  const emailsView = document.getElementById('emails-view')
-
+  // const emailsView = document.getElementById('emails-view')
+  const mailsTbody = document.querySelector('tbody');
   mails.forEach(mail => {
 
     mailContainer = createMailContainer(mail)
-    // Append mailbox to view
-    emailsView.append(mailContainer);
+
+    mailsTbody.append(mailContainer);
 
   })
 }
 
 // Create main container and fill in the values and styles
 function createMailContainer(mail) {
-  // Create container elements, mailbox and left info
-  const mailContainer = document.createElement('div');
-  const leftInfo = document.createElement('div');
+
+  // Create mail container as table row
+  const mailContainer = document.createElement('tr');
 
   // Left info in mailbox
+  const leftInfo = document.createElement('div');
   const senderTag = document.createElement('strong');
   const subjectTag = document.createElement('span');
   subjectTag.classList.add('pl-3');
@@ -141,10 +154,12 @@ function createMailContainer(mail) {
   senderTag.innerHTML = mail.sender;
   subjectTag.innerHTML = mail.subject;
   timestampTag.innerHTML = mail.timestamp;
+  mailContainer.append(leftInfo, timestampTag);
 
   // Style for mailbox
-  mailContainer.append(leftInfo, timestampTag);
   mailContainer.classList.add('d-flex', 'justify-content-between', 'p-2', 'border', 'border-dark');
+  mailContainer.setAttribute('style', 'cursor: pointer;')
+  if (mail.read) mailContainer.classList.add('bg-secondary');
 
   return mailContainer
 }
