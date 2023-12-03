@@ -2,9 +2,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
   ['inbox', 'sent', 'archived'].forEach(id => {
     document.getElementById(id).addEventListener('click', () => load_mailbox(id))
-  })
+  });
   
-  document.getElementById('compose').addEventListener('click', compose_email)
+  document.getElementById('compose').addEventListener('click', compose_email);
  
   // By default, load the inbox
   load_mailbox('inbox');
@@ -50,8 +50,6 @@ function load_mailbox(mailbox) {
 
   getMailsFromBackendAndDisplayThem(mailbox);
 
-
-  
 }
 
 // Fetch the mail clicked from the backend
@@ -75,8 +73,28 @@ function openMail() {
       document.querySelector('#open-mail-view').style.display = 'block';
       
       displayMail(result);
+      updateReadStatus(result);
     }
   })
+  
+}
+
+function updateReadStatus(mail) {
+  fetch(`/emails/${mail.id}`, {
+    'method': 'PUT', 
+    'body': JSON.stringify({
+      read: true
+    })
+  })
+  .then(response => {
+    if (!response.ok) {
+      result = response.json();
+      const mainContainer = $(this).parents().eq(2);
+      createAlertMessage('alert-danger', mainContainer, result.error)
+    } else {
+      console.log(`Update mail id: ${mail.id} to read status: true`)
+    }
+  }) 
   
 }
 
@@ -189,14 +207,25 @@ function createAlertMessage(alertType, parentElement, message) {
 }
 
 
+
 function getMailsFromBackendAndDisplayThem(mailbox) {
   
   fetch(`/emails/${mailbox}`)
   .then(response => response.json())
-  .then(mails => {
-    displayMails(mails);
+  .then(result => {
+    if (result.error) {
+
+      const emailsView = document.getElementById('emails-view');
+      createAlertMessage('alert-danger', emailsView, result.error)
+    } else {
+      displayMails(result);
+    }
+   
   }) 
-  .catch(error => console.error(error))
+  .catch(error => {
+    const emailsView = document.getElementById('emails-view');
+    createAlertMessage('alert-danger', emailsView, error)
+  })
 }
 
 function displayMails(mails) {
