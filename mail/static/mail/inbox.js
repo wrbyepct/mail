@@ -128,12 +128,11 @@ function displayMail(mail) {
       infoRow.append(boldTitle, infoTag);
       mailContainer.append(infoRow);
   })
+  
+ 
+  const actionBox = creatActionBox(mail.archived);
 
-  // Attach reply button 
-  const replyBtn = document.createElement('button');
-  replyBtn.innerHTML = 'Reply';
-  replyBtn.classList.add('btn', 'btn-outline-primary');
-  mailContainer.append(replyBtn);
+  mailContainer.append(actionBox);
 
   // Attach break line 
   mailContainer.append(document.createElement('hr'));
@@ -145,7 +144,70 @@ function displayMail(mail) {
   const openMailView = document.getElementById('open-mail-view');
   openMailView.replaceChild(mailContainer, openMailView.firstChild);
 
+  
 }
+
+function creatActionBox(isArchived) {
+  console.log(isArchived);
+  // Attach action buttons: Reply and archive 
+  const actionBox = document.createElement('div');
+  actionBox.classList.add('d-flex', 'justify-content-between', 'align-items-center')
+
+  
+  const archiveBox = document.createElement('div');
+  archiveBox.setAttribute('id', 'archive-toggle');
+
+  // Create archive button
+  const archiveBtn = createArchiveBtn(isArchived);
+
+  // Attach to archive box
+  archiveBox.append(archiveBtn);
+
+  // Set click event toggle logic between archive and unarhive
+  archiveBox.addEventListener('click', function(isArchived) {
+    const archiveBtn = createArchiveBtn(isArchived);
+    this.replaceChild(archiveBtn, this.firstChild);
+    // Enable tooltip 
+    $('#archive').tooltip();
+  } );
+
+  // Reply button 
+  const replyBtn = document.createElement('button');
+  replyBtn.innerHTML = 'Reply';
+  replyBtn.classList.add('btn', 'btn-outline-primary');
+
+  actionBox.append(replyBtn, archiveBox);
+
+  return actionBox
+}
+
+
+function createArchiveBtn(isArchived) {
+
+  const archiveBtn = document.createElement('i');
+
+  let archiveAttrs = {'data-toggle': 'tooltip', 'id': 'archive'};
+
+  if (isArchived) {
+
+    archiveBtn.className = 'bi bi-archive-fill';
+    archiveAttrs['title'] = 'Unarchive';
+
+  } else {
+    
+    archiveBtn.className = 'bi bi-archive';
+    archiveAttrs['title'] = 'Archive';
+    
+  }
+
+  Object.entries(archiveAttrs).forEach(([attr, value]) => {
+    archiveBtn.setAttribute(attr, value);
+  })
+
+  return archiveBtn
+
+}
+
 
 function post_compose(event) {
 
