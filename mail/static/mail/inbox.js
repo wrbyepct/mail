@@ -73,9 +73,50 @@ function openMail() {
       document.querySelector('#open-mail-view').style.display = 'block';
       
       displayMail(result);
-      updateReadStatus(result);
+      // After archive totggle attached to document can it then activate the tooltip 
+      $(`#archive-toggle`).tooltip();
+
+      if (!result.read)
+        updateReadStatus(result);
     }
   })
+  
+}
+
+function displayMail(mail) {
+
+  const mailContainer = document.createElement('div');
+
+  const mailInfo = {
+    'sender': 'From: ',
+    'recipients': 'To: ',
+    'subject': 'Subject: ',
+    'timestamp': 'Timestamp: '
+  }
+
+  // Attach each row of info: From, To, Subject, Timestamp to mail container
+  Object.entries(mailInfo).forEach(([key, title]) => {
+
+      const infoRow = document.createElement('div');
+      const boldTitle = document.createElement('strong');
+      const infoTag = document.createElement('span');
+
+      boldTitle.innerHTML = title;
+      infoTag.innerHTML = (key === 'recipients') ? mail[key].join(', ') : mail[key];
+      
+      infoRow.append(boldTitle, infoTag);
+      mailContainer.append(infoRow);
+  })
+  
+  mailContainer.append(
+    ActionBox(mail.id, mail.archived),     // Attach actions box: Reply, Arhive buttons
+    document.createElement('hr'), // Attach break line 
+    mail.body                     // Attach content body 
+  );
+
+  // Attch to open mail view 
+  const openMailView = document.getElementById('open-mail-view');
+  openMailView.replaceChild(mailContainer, openMailView.firstChild);
   
 }
 
@@ -98,95 +139,39 @@ function updateReadStatus(mail) {
   
 }
 
-function displayMail(mail) {
-
-  const mailContainer = document.createElement('div');
-
-  const mailInfo = {
-    'sender': 'From: ',
-    'recipients': 'To: ',
-    'subject': 'Subject: ',
-    'timestamp': 'Timestamp: '
-  }
-
-  // Attach each row of info: From, To, Subject, Timestamp
-  Object.entries(mailInfo).forEach(([key, title]) => {
-
-      const infoRow = document.createElement('div')
-      const boldTitle = document.createElement('strong');
-      const infoTag = document.createElement('span');
-
-      boldTitle.innerHTML = title;
-
-      if (key === 'recipients') {
-        const recipients = mail[key].join(', ');
-        infoTag.innerHTML = recipients;
-      }
-      else 
-        infoTag.innerHTML = mail[key];
-
-      infoRow.append(boldTitle, infoTag);
-      mailContainer.append(infoRow);
+function updateArchivedStatus(mailId, isArchived) {
+  
+  fetch(`/emails/${mailId}`, {
+    method: 'PUT', 
+    body: JSON.stringify({
+      'archived': isArchived
+    })
   })
-  
-  // Attach actions box: Reply, Arhive
-  const actionBox = ActionBox(mail.archived);
-  mailContainer.append(actionBox);
-
-  // Attach break line 
-  mailContainer.append(document.createElement('hr'));
-
-  // Attach content body 
-  mailContainer.append(mail.body);
-
-  // Attch to open mail view 
-  const openMailView = document.getElementById('open-mail-view');
-  openMailView.replaceChild(mailContainer, openMailView.firstChild);
-  
-  $(`#${actionBox.lastChild.id}`).tooltip();
+  .then(response => {
+    if (!response.ok) {
+      createAlertMessage('alert-danger', $('#open-mail-view'), response.json().error);
+    } else {
+      console.log(`Archive state successfully updated for mail id: ${mailId} to ${isArchived ? "Archived" : "Not Archived"}`);
+    }
+  })
 }
 
-function ActionBox(isArchived) {
+function ActionBox(mailId, isArchived) {
   
-  // Attach action buttons: Reply and archive 
+  // Create action buttons container for Reply and Archive buttons 
   const actionBox = document.createElement('div');
   actionBox.classList.add('d-flex', 'justify-content-between', 'align-items-center')
 
   // Create archive button
-  const archiveBtn = ArchiveBtn(isArchived);
+  const archiveBtn = ArchiveBtn(mailId, isArchived);
  
-
-  // Set click event toggle logic between archive and unarhive
-  archiveBtn.addEventListener('click', function() {
-
-    let archiveIcon;
-    if (this.label === 'Archived') {
-
-      // Reset to not archived
-      archiveIcon = ArchiveIcon('bi bi-archive');
-      this.setAttribute('data-original-title', 'Archive');
-      this.label = 'Not Archived';
-
-    } else {
-
-      archiveIcon = ArchiveIcon('bi bi-archive-fill');
-      this.setAttribute('data-original-title', 'Unarchive');
-      this.label = 'Archived';
-    }
-    
-    // Reset tooltip
-    $(`#${this.id}`).tooltip('hide').tooltip('show');
-
-    // Switch dislaying icon
-    this.replaceChild(archiveIcon, this.firstChild);
-    
-  } );
-
   // Reply button 
   const replyBtn = document.createElement('button');
   replyBtn.innerHTML = 'Reply';
   replyBtn.className = 'btn btn-outline-primary';
 
+
+  // Attach action buttons: Reply and archive 
   actionBox.append(replyBtn, archiveBtn);
 
 
@@ -194,12 +179,12 @@ function ActionBox(isArchived) {
 }
 
 
-function ArchiveBtn(isArchived) {
+function ArchiveBtn(mailId, isArchived) {
 
   const archiveBtn = document.createElement('div');
   archiveBtn.id = 'archive-toggle';
 
-  let archiveAttrs = {'data-toggle': 'tooltip'};
+  let archiveAttrs = {'data-toggle': 'tooltip', 'data-mailid': mailId};
   
   let archiveIcon;
 
@@ -208,7 +193,7 @@ function ArchiveBtn(isArchived) {
     archiveIcon = ArchiveIcon('bi bi-archive-fill');
 
     archiveAttrs['title'] = 'Unarchive';
-    archiveAttrs['label'] = 'Achived';
+    archiveAttrs['data-archived'] = 'true';
   }
   else {
 
@@ -224,6 +209,38 @@ function ArchiveBtn(isArchived) {
 
   // Attach to archive button
   archiveBtn.append(archiveIcon);
+
+  // Set click event toggle logic between archive and unarhive
+  archiveBtn.addEventListener('click', function() {
+
+    let archiveIcon;
+    if (this.dataset.archived === 'true') {
+      
+      // Reset to not archived
+      archiveIcon = ArchiveIcon('bi bi-archive');
+      this.setAttribute('data-original-title', 'Archive');
+      this.dataset.archived = 'false';
+      isArchived = false;
+
+    } else {
+      
+      archiveIcon = ArchiveIcon('bi bi-archive-fill');
+      this.setAttribute('data-original-title', 'Unarchive');
+      this.dataset.archived = 'true';
+      isArchived = true;
+    }
+    
+    // Reset tooltip
+    $(`#${this.id}`).tooltip('hide').tooltip('show');
+
+    // Switch dislaying icon
+    this.replaceChild(archiveIcon, this.firstChild);
+
+    // update archive status
+    updateArchivedStatus(mailId, isArchived);
+
+    
+  } );
 
   return archiveBtn
 
