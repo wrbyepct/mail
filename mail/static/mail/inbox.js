@@ -129,9 +129,8 @@ function displayMail(mail) {
       mailContainer.append(infoRow);
   })
   
- 
-  const actionBox = creatActionBox(mail.archived);
-
+  // Attach actions box: Reply, Arhive
+  const actionBox = ActionBox(mail.archived);
   mailContainer.append(actionBox);
 
   // Attach break line 
@@ -143,68 +142,99 @@ function displayMail(mail) {
   // Attch to open mail view 
   const openMailView = document.getElementById('open-mail-view');
   openMailView.replaceChild(mailContainer, openMailView.firstChild);
-
   
+  $(`#${actionBox.lastChild.id}`).tooltip();
 }
 
-function creatActionBox(isArchived) {
-  console.log(isArchived);
+function ActionBox(isArchived) {
+  
   // Attach action buttons: Reply and archive 
   const actionBox = document.createElement('div');
   actionBox.classList.add('d-flex', 'justify-content-between', 'align-items-center')
 
-  
-  const archiveBox = document.createElement('div');
-  archiveBox.setAttribute('id', 'archive-toggle');
-
   // Create archive button
-  const archiveBtn = createArchiveBtn(isArchived);
-
-  // Attach to archive box
-  archiveBox.append(archiveBtn);
+  const archiveBtn = ArchiveBtn(isArchived);
+ 
 
   // Set click event toggle logic between archive and unarhive
-  archiveBox.addEventListener('click', function(isArchived) {
-    const archiveBtn = createArchiveBtn(isArchived);
-    this.replaceChild(archiveBtn, this.firstChild);
-    // Enable tooltip 
-    $('#archive').tooltip();
+  archiveBtn.addEventListener('click', function() {
+
+    let archiveIcon;
+    if (this.label === 'Archived') {
+
+      // Reset to not archived
+      archiveIcon = ArchiveIcon('bi bi-archive');
+      this.setAttribute('data-original-title', 'Archive');
+      this.label = 'Not Archived';
+
+    } else {
+
+      archiveIcon = ArchiveIcon('bi bi-archive-fill');
+      this.setAttribute('data-original-title', 'Unarchive');
+      this.label = 'Archived';
+    }
+    
+    // Reset tooltip
+    $(`#${this.id}`).tooltip('hide').tooltip('show');
+
+    // Switch dislaying icon
+    this.replaceChild(archiveIcon, this.firstChild);
+    
   } );
 
   // Reply button 
   const replyBtn = document.createElement('button');
   replyBtn.innerHTML = 'Reply';
-  replyBtn.classList.add('btn', 'btn-outline-primary');
+  replyBtn.className = 'btn btn-outline-primary';
 
-  actionBox.append(replyBtn, archiveBox);
+  actionBox.append(replyBtn, archiveBtn);
+
 
   return actionBox
 }
 
 
-function createArchiveBtn(isArchived) {
+function ArchiveBtn(isArchived) {
 
-  const archiveBtn = document.createElement('i');
+  const archiveBtn = document.createElement('div');
+  archiveBtn.id = 'archive-toggle';
 
-  let archiveAttrs = {'data-toggle': 'tooltip', 'id': 'archive'};
+  let archiveAttrs = {'data-toggle': 'tooltip'};
+  
+  let archiveIcon;
 
   if (isArchived) {
 
-    archiveBtn.className = 'bi bi-archive-fill';
-    archiveAttrs['title'] = 'Unarchive';
+    archiveIcon = ArchiveIcon('bi bi-archive-fill');
 
-  } else {
-    
-    archiveBtn.className = 'bi bi-archive';
+    archiveAttrs['title'] = 'Unarchive';
+    archiveAttrs['label'] = 'Achived';
+  }
+  else {
+
+    archiveIcon = ArchiveIcon('bi bi-archive');
+
     archiveAttrs['title'] = 'Archive';
-    
   }
 
   Object.entries(archiveAttrs).forEach(([attr, value]) => {
     archiveBtn.setAttribute(attr, value);
   })
+  
+
+  // Attach to archive button
+  archiveBtn.append(archiveIcon);
 
   return archiveBtn
+
+}
+
+function ArchiveIcon(className) {
+
+  const archiveIcon = document.createElement('i');
+  archiveIcon.className = className;
+
+  return archiveIcon
 
 }
 
@@ -267,7 +297,6 @@ function createAlertMessage(alertType, parentElement, message) {
   // Place it at the top of the view div
   parentElement.prepend(alertMessage)
 }
-
 
 
 function getMailsFromBackendAndDisplayThem(mailbox) {
