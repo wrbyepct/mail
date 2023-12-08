@@ -4,14 +4,14 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById(id).addEventListener('click', () => load_mailbox(id))
   });
   
-  document.getElementById('compose').addEventListener('click', compose_email);
+  document.getElementById('compose').addEventListener('click', () => compose_email());
  
   // By default, load the inbox
   load_mailbox('inbox');
 });
 
 // Display compose mail form
-function compose_email() {
+function compose_email(recipient="", subject="", body="") {
 
   // Show compose view and hide other views
   document.querySelector('#emails-view').style.display = 'none';
@@ -19,16 +19,29 @@ function compose_email() {
   document.querySelector('#compose-view').style.display = 'block';
 
   // Clear out composition fields
-  document.querySelector('#compose-recipients').value = '';
-  document.querySelector('#compose-subject').value = '';
-  document.querySelector('#compose-body').value = '';
+  document.querySelector('#compose-recipients').value = recipient;
+  document.querySelector('#compose-subject').value = subject;
+  document.querySelector('#compose-body').value = body;
 
   // Listen to submit compose event
   document.querySelector('#submit-compose').addEventListener('click', (event) => post_compose(event));
 }
 
 function load_mailbox(mailbox) {
+
+  const emailIcon = document.createElement('i');
+  // Jquery way to replace inbox first's child with another icon
+  if (mailbox != 'inbox') 
+    emailIcon.className = 'bi bi-envelope-fill nav-icon';
+  else 
+    emailIcon.className = 'bi bi-envelope-open nav-icon';
   
+  $('#inbox').children().eq(0).replaceWith(emailIcon);
+  
+  // Set the navbar active class, and remove other inactive ones
+  $(`#${mailbox}`).addClass('active');
+  $(`#${mailbox}`).siblings().removeClass('active');
+
   // Show the mailbox and hide other views
   document.querySelector('#emails-view').style.display = 'block';
   document.querySelector('#compose-view').style.display = 'none';
@@ -36,7 +49,7 @@ function load_mailbox(mailbox) {
 
   // Create table for mails 
   const mailsTable = document.createElement('table')
-  mailsTable.classList.add('table', 'table-hover')
+  mailsTable.classList.add('table')
   const mailsTbody = document.createElement('tbody')
   mailsTable.append(mailsTbody)
 
@@ -44,11 +57,34 @@ function load_mailbox(mailbox) {
 
   // Show the mailbox name
   emailsView.innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
-
+  emailsView.dataset.mailbox = mailbox;
   // Add mailsTable to emails view
   emailsView.append(mailsTable);
 
   getMailsFromBackendAndDisplayThem(mailbox);
+
+}
+
+// Reply button logic
+function replyToMail(mail) {
+
+  // Fill in the compose form with mail info
+  let subject = mail.subject; 
+  if(mail.subject.startsWith('Re: ')) 
+    subject = mail.subject;
+  else
+    subject = `Re: ${mail.subject}`;
+  false
+
+  const breakLine = "\n\n-----------------------------------------------------------------\n";
+  compose_email(mail.sender, subject,  breakLine + `On ${mail.timestamp} ${mail.sender} wrote: \n${mail.body}`);
+  const composeView = document.getElementById('compose-body');
+
+  composeView.scrollIntoView({behavior: 'smooth', block: 'start'});
+  composeView.focus();
+  // move the cursor to the start of the text
+  composeView.setSelectionRange(0, 0);
+
 
 }
 
@@ -83,9 +119,13 @@ function openMail() {
   
 }
 
+// Display the clicked mail
 function displayMail(mail) {
 
   const mailContainer = document.createElement('div');
+  mailContainer.classList.add('p-3', 'border', 'border-dark');
+  // Set data mail id to mail container
+  mailContainer.setAttribute('data-mailid', mail.id);
 
   const mailInfo = {
     'sender': 'From: ',
@@ -108,11 +148,30 @@ function displayMail(mail) {
       mailContainer.append(infoRow);
   })
   
+  
   mailContainer.append(
-    ActionBox(mail.id, mail.archived),     // Attach actions box: Reply, Arhive buttons
+    ActionBox(mail),     // Attach actions box: Reply, Arhive buttons
     document.createElement('hr'), // Attach break line 
-    mail.body                     // Attach content body 
   );
+
+  // Reformat the body text
+  const passages = mail.body.split('\n');
+  passages.forEach((passage, index) => {
+    
+    console.log(passage)
+    // Create a title element for passage it starts with "On" and end with "wrote:"
+    if (passage.startsWith('On') && passage.endsWith('wrote: ')) {
+      const title = document.createElement('h6');
+      title.innerHTML = passage;
+      mailContainer.append(title);
+    } else {
+      // Create a paragraph element for passage
+      const paragraph = document.createElement('p');
+      paragraph.classList.add('mb-0');
+      paragraph.innerHTML = passage;
+      mailContainer.append(paragraph);
+    } 
+})
 
   // Attch to open mail view 
   const openMailView = document.getElementById('open-mail-view');
@@ -120,6 +179,7 @@ function displayMail(mail) {
   
 }
 
+// Update the clicked mail to read status if it is not read
 function updateReadStatus(mail) {
   fetch(`/emails/${mail.id}`, {
     'method': 'PUT', 
@@ -139,6 +199,7 @@ function updateReadStatus(mail) {
   
 }
 
+// Update the opened mail to archived status, if archived button is clicked
 function updateArchivedStatus(mailId, isArchived) {
   
   fetch(`/emails/${mailId}`, {
@@ -152,35 +213,48 @@ function updateArchivedStatus(mailId, isArchived) {
       createAlertMessage('alert-danger', $('#open-mail-view'), response.json().error);
     } else {
       console.log(`Archive state successfully updated for mail id: ${mailId} to ${isArchived ? "Archived" : "Not Archived"}`);
+
+      // After update the archived status, load the inbox again
+      load_mailbox('inbox');
     }
   })
 }
 
-function ActionBox(mailId, isArchived) {
+// Create action buttons container: Reply and Archive buttons
+function ActionBox(mail) {
   
   // Create action buttons container for Reply and Archive buttons 
   const actionBox = document.createElement('div');
-  actionBox.classList.add('d-flex', 'justify-content-between', 'align-items-center')
+  actionBox.classList.add('d-flex')
 
   // Create archive button
-  const archiveBtn = ArchiveBtn(mailId, isArchived);
+  const archiveBtn = ArchiveBtn(mail.id, mail.archived);
  
   // Reply button 
+  // If current mailbox is sent, do not show reply button
+  if ($('#emails-view').data('mailbox') === 'sent') {
+    actionBox.append(archiveBtn);
+    actionBox.classList.add('justify-content-end');
+    return actionBox
+  
+  }
+
   const replyBtn = document.createElement('button');
   replyBtn.innerHTML = 'Reply';
   replyBtn.className = 'btn btn-outline-primary';
-
+  replyBtn.addEventListener('click', () => replyToMail(mail));
 
   // Attach action buttons: Reply and archive 
   actionBox.append(replyBtn, archiveBtn);
-
+  actionBox.classList.add('justify-content-between', 'align-items-center');
 
   return actionBox
 }
 
-
+// Create archive button
 function ArchiveBtn(mailId, isArchived) {
 
+  // Create archive button
   const archiveBtn = document.createElement('div');
   archiveBtn.id = 'archive-toggle';
 
@@ -338,7 +412,16 @@ function getMailsFromBackendAndDisplayThem(mailbox) {
 
 function displayMails(mails) {
 
-  // const emailsView = document.getElementById('emails-view')
+  // If no mails in this mailbox, display a message
+  if (!mails.length) {
+    const mailxEmptyMessage = document.createElement('div');
+    mailxEmptyMessage.classList.add('text-center', 'text-muted');
+    mailxEmptyMessage.innerHTML = 'No mails in this mailbox';
+    document.querySelector('#emails-view').append(mailxEmptyMessage);
+    return
+  }
+  
+  // Create mail container for each mail
   const mailsTbody = document.querySelector('tbody');
   mails.forEach(mail => {
 
@@ -358,30 +441,34 @@ function createMailContainer(mail) {
   // Create mail container as table row
   const mailContainer = document.createElement('tr');
 
-  // Left info in mailbox
-  const leftInfo = document.createElement('div');
-  const senderTag = document.createElement('strong');
+  // Set responsive grid system
+  const row = document.createElement('div');
+  row.classList.add('row', 'px-3', 'py-3', 'align-items-center');
+  const senderTag = document.createElement('span');
+  senderTag.classList.add('col-3');
   const subjectTag = document.createElement('span');
-  subjectTag.classList.add('pl-3');
-  leftInfo.append(senderTag, subjectTag);
-  
-  // timestamp right info
+  subjectTag.classList.add('col-6');
   const timestampTag = document.createElement('span');
-  timestampTag.classList.add('text-muted');
+  timestampTag.classList.add('col-3', 'small-text');
+  row.append(senderTag, subjectTag, timestampTag);
 
   // fill in the value 
   senderTag.innerHTML = mail.sender;
   subjectTag.innerHTML = mail.subject;
   timestampTag.innerHTML = mail.timestamp;
-  mailContainer.append(leftInfo, timestampTag);
+  mailContainer.append(row);
 
   // Attach email id 
   mailContainer.setAttribute('data-mailid', mail.id)
 
-  // Style for mailbox
-  mailContainer.classList.add('d-flex', 'justify-content-between', 'p-2', 'border', 'border-dark');
-  mailContainer.setAttribute('style', 'cursor: pointer;')
-  if (mail.read) mailContainer.setAttribute('style', 'background: #D3D3D3; cursor: pointer;')
+ 
+  
+  if (mail.read) {
+    mailContainer.setAttribute('style', 'background: #f2f6fc;');
+    
+  } else {
+    mailContainer.setAttribute('style', 'font-weight: bold;');
+  }
 
   return mailContainer
 }

@@ -1,3 +1,7 @@
+:root {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
 textarea {
     min-height: 400px;
 }
@@ -8,21 +12,24 @@ textarea {
         font-size: 16px;
         padding: 12px;
         margin-bottom: 10px;
-        
+
     }
+
     70% {
         opacity: 1;
         font-size: 16px;
         padding: 12px;
         margin-bottom: 10px;
-        
+
     }
+
     80% {
         opacity: 0;
         font-size: 16px;
         padding: 12px;
         margin-bottom: 10px;
     }
+
     100% {
         opacity: 0;
         font-size: 0px;
@@ -53,6 +60,82 @@ i::before {
     transform: translateY(80%);
 }
 
+#logout {
+    transition: all 0.1s ease-in-out;
+    width: 80px;
+    height: 2rem;
+}
+
+#logout:hover {
+    color: rgb(250, 97, 97);
+    transform: scale(1.01);
+    font-weight: bolder;
+}
+
+/* Compose btn */
+#compose:hover {
+
+    /* Larger shadow at the bottom */
+    box-shadow: 0 0.252rem 1rem rgba(0, 0, 0, 0.15) !important;
+    transform: scale(1.01);
+}
+
+/* Nav btns */
+.nav-btn {
+    width: 15rem;
+    height: 3.5rem;
+    padding: 10px 0;
+    margin: 0px;
+
+    font-size: 1.125rem;
+
+    border-bottom: 5px solid rgba(152, 152, 152, 0.715);
+    cursor: pointer;
+    transition: all 0.1s ease-in-out;
+
+}
+
+.nav-btn:hover {
+    background-color: #ededeeba;
+}
+
+.nav-icon {
+    margin-right: 0.5rem;
+}
+
+.nav-icon::before {
+    transform: translateY(-1%);
+}
+
+
+/* Utils */
+.active {
+    color: rgb(19, 122, 219);
+    font-weight: bold;
+    border-bottom: 5px solid rgb(19, 122, 219);
+}
+
+.small-text {
+    font-size: 0.75rem;
+}
 
 
 
+
+
+
+/* Table style */
+
+tbody {
+    border-top: 1px solid #dadce0;
+}
+
+tr {
+    cursor: pointer;
+    border-bottom: 1px solid #dadce0;
+
+}
+
+tr:hover {
+    box-shadow: inset 1px 0 0 #dadce0, inset -1px 0 0 #dadce0, 0 1px 2px 0 rgba(60, 64, 67, .3), 0 1px 3px 1px rgba(60, 64, 67, .15);
+}
