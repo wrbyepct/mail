@@ -56,9 +56,6 @@ textarea {
     background: #dadce0;
 }
 
-i::before {
-    transform: translateY(80%);
-}
 
 #logout {
     transition: all 0.1s ease-in-out;
@@ -141,7 +138,7 @@ tr:hover {
 }
 
 
-/* Login box */
+/* Credential page */
 .credential-box {
     max-width: 30rem;
     min-width: 25rem;
@@ -156,10 +153,10 @@ tr:hover {
 
 }
 
-.form-control {
-    
+.form-group {
+
     border-radius: 2rem;
-    padding: 1.875rem 1.25rem;
+    padding: 1.125rem 1.25rem;
     background: transparent; 
     border: none;
     /* Set box show that makes the button a little bit coming out */
@@ -169,26 +166,54 @@ tr:hover {
     
 }
 
-.form-control:focus {
+.form-group:focus {
 
-    color: #dadce0;
     background: transparent;
     border: 1px solid rgb(148, 198, 244);
     box-shadow: none
  
 }
 
+.form-control {
+    background: transparent;
+    border: none;
+    color: inherit;
+}
+
+.form-control:focus {
+    color: #dadce0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+
+
 .form-control::placeholder {
     color: #b6b6b6;
     
 }
 
+.eye-icon {
+    cursor: pointer;
+    font-size: 1.375rem;
+    
+}
+
+/* Login or Register */
 .credential-btn {
     border-radius: 2rem;
     padding: 1rem 1.25rem;
 }
 
+/* Prompt for register or log in */
+.user-prompt {
+    color: #68a2e0;
+    transition: all 0.1s ease-in-out;
+}
+
 .user-prompt:hover {
-    color: rgb(250, 97, 97);
+    color: rgb(244, 132, 68);
     font-weight: bolder;
+    text-decoration: none;
 }

@@ -8,7 +8,9 @@ document.addEventListener('DOMContentLoaded', function() {
  
   // By default, load the inbox
   load_mailbox('inbox');
+
 });
+
 
 // Display compose mail form
 function compose_email(recipient="", subject="", body="") {
