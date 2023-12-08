@@ -105,6 +105,11 @@ textarea {
 }
 
 
+.archive-icon::before {
+    transform: translateY(80%);
+}
+
+
 /* Utils */
 .active {
     color: rgb(19, 122, 219);
@@ -121,7 +126,7 @@ textarea {
 
 
 
-/* Table style */
+/* Email body Table style */
 
 tbody {
     border-top: 1px solid #dadce0;
@@ -153,6 +158,7 @@ tr:hover {
 
 }
 
+/* User account info container */
 .form-group {
 
     border-radius: 2rem;
@@ -187,11 +193,8 @@ tr:hover {
     box-shadow: none;
 }
 
-
-
 .form-control::placeholder {
     color: #b6b6b6;
-    
 }
 
 .eye-icon {
@@ -200,7 +203,7 @@ tr:hover {
     
 }
 
-/* Login or Register */
+/* Login or Register btn */
 .credential-btn {
     border-radius: 2rem;
     padding: 1rem 1.25rem;

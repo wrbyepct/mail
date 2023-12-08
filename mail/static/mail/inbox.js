@@ -266,14 +266,14 @@ function ArchiveBtn(mailId, isArchived) {
 
   if (isArchived) {
 
-    archiveIcon = ArchiveIcon('bi bi-archive-fill');
+    archiveIcon = ArchiveIcon('bi bi-archive-fill archive-icon');
 
     archiveAttrs['title'] = 'Unarchive';
     archiveAttrs['data-archived'] = 'true';
   }
   else {
 
-    archiveIcon = ArchiveIcon('bi bi-archive');
+    archiveIcon = ArchiveIcon('bi bi-archive archive-icon');
 
     archiveAttrs['title'] = 'Archive';
   }
