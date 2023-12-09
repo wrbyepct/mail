@@ -23,15 +23,19 @@ function load_mailbox(mailbox) {
     emailIcon.addClass('bi bi-envelope-open nav-icon');
 
    // Jquery way to replace inbox first's child with another icon
-  $('#inbox').children().eq(0).replaceWith(emailIcon);
+  $('#inbox')
+    .children()
+    .eq(0)
+    .replaceWith(emailIcon);
   
   // Set the navbar active class, and remove other inactive ones
-  $(`#${mailbox}`).addClass('active');
-  $(`#${mailbox}`).siblings().removeClass('active');
+  $(`#${mailbox}`)
+    .addClass('active')
+    .siblings().removeClass('active');
 
 
   // Set emails view title and set the mailbox data attribute
-  const emailsView = $('#emails-view')
+  $('#emails-view')
     .html(`<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`)
     .data('mailbox', mailbox)
     .css('display', 'block')
@@ -65,21 +69,22 @@ function displayMails(mails) {
 
   // If no mails in this mailbox, display a empty message
   if (!mails.length) {
-    const mailxEmptyMessage = document.createElement('div');
-    mailxEmptyMessage.classList.add('text-center', 'text-muted');
-    mailxEmptyMessage.innerHTML = 'No mails in this mailbox';
-    document.querySelector('#emails-view').append(mailxEmptyMessage);
+    $('<div>')
+      .addClass('text-center text-muted')
+      .text('No mails in this mailbox')
+      .appendTo($('#emails-view'));
+    
     return
   }
   
   // Create mail container for each mail
-  const emailsView = $('#emails-view')
+  const emailsView = $('#emails-view');
   mails.forEach(mail => {
 
     mailContainer = createMailContainer(mail)
 
     // Add mail clicking event listener to them
-    mailContainer.on('click', openMail);
+    mailContainer.on('click', () => openMail(mail.id));
 
     emailsView.append(mailContainer);
 
@@ -89,32 +94,19 @@ function displayMails(mails) {
 // Create main container and fill in the values and styles
 function createMailContainer(mail) {
 
-  // Create mail container as table row
+  // Create mail container that display sender, subject, timestamp
   const mailContainer = $('<div>')
-    .addClass('mail-container')
-    .attr('data-mailid', mail.id);
+    .addClass('mail-container row px-3 py-3 align-items-center')
+    .attr('data-mailid', mail.id)
+    .append($('<span>').addClass('col-3').text(mail.sender))  // Sender
+    .append($('<span>').addClass('col-6').text(mail.subject)) // Subject
+    .append($('<span>').addClass('col-3 small-text text-end').text(mail.timestamp)); // Timestamp
 
   // Set the background color and font weight if the mail is read
   if (mail.read) 
     mailContainer.css('background', '#f2f6fc');
   else 
     mailContainer.css('font-weight', 'bold');
-
-  // Set responsive grid system for mail info
-  const row = $('<div>').addClass('row px-3 py-3 align-items-center');
- 
-  const senderTag = $('<span>').addClass('col-3');
-  const subjectTag = $('<span>').addClass('col-6');
-  const timestampTag = $('<span>').addClass('col-3 small-text text-end')
-  
-  row.append(senderTag, subjectTag, timestampTag);
-
-  // fill in the value 
-  senderTag.html(mail.sender);
-  subjectTag.html(mail.subject);
-  timestampTag.html(mail.timestamp);
-
-  mailContainer.append(row);
 
   return mailContainer
 }
@@ -138,11 +130,11 @@ function createAlertMessage(alertType, parentElement, message) {
 function compose_email(recipient="", subject="", body="") {
 
   // Show compose view and hide other views
-  $('#emails-view').css('display', 'none');
-  $('#open-mail-view').css('display', 'none');
-  $('#compose-view').css('display', 'block');
+  $('#compose-view')
+    .css('display', 'block')
+    .sblings().css('display', 'none');
 
-  // Clear out composition fields
+  // Set the default values to empty string if it's not a reply mail
   $('#compose-recipients').val(recipient);
   $('#compose-subject').val(subject);
   $('#compose-body').val(body);
@@ -156,17 +148,12 @@ function post_compose(event) {
   // Prevent refresh default behaviour
   event.preventDefault();
 
-  // Get all the input values of a compose 
-  const recipients = $('#compose-recipients').val();
-  const subject = $('#compose-subject').val();
-  const body = $('#compose-body').val();
-
   fetch('/emails', {
     method: 'POST',
     body: JSON.stringify({
-      recipients: recipients,
-      subject: subject,
-      body: body
+      recipients: $('#compose-recipients').val(),
+      subject: $('#compose-subject').val(),
+      body: $('#compose-body').val()
     })
   })
   .then(response => response.json())
@@ -192,10 +179,9 @@ function post_compose(event) {
 
 
 // Fetch the mail clicked from the backend
-function openMail() {
+function openMail(mailId) {
   
-  const emailId = this.dataset.mailid;
-  fetch(`/emails/${emailId}`)
+  fetch(`/emails/${mailId}`)
   .then(response => response.json())
   .then(result => {
     if (result.error) {
@@ -206,11 +192,11 @@ function openMail() {
 
     } else {
 
-       // Hide the other views and show open mail view 
-      $('#emails-view').css('display', 'none');
-      $('#compose-view').css('display', 'none');
-      $('#open-mail-view').css('display', 'block');
-      
+      // Hide the other views and show open mail view 
+      $('#open-mail-view')
+        .css('display', 'block')
+        .siblings().css('display', 'none');
+
       displayMail(result);
 
       // After archive toggle attached to document can it then activate the tooltip 
@@ -226,62 +212,47 @@ function openMail() {
 // Display the clicked mail
 function displayMail(mail) {
 
-  const clickedMailContainer = $('<div>')
-    .addClass('p-3 border border-dark')
-    .attr('data-mailid', mail.id);
-
+  const clickedMailContainer = $(`<div class="p-3 border border-dark" 
+                                      data-mailid="${mail.id}">`);
 
   const mailInfo = {
-    'sender': 'From: ',
-    'recipients': 'To: ',
-    'subject': 'Subject: ',
-    'timestamp': 'Timestamp: '
+    'From: ': mail.sender,
+    'To: ': mail.recipients.join(', '),
+    'Subject: ': mail.subject,
+    'Timestamp: ': mail.timestamp
   }
 
   // Attach each row of info: From, To, Subject, Timestamp to mail container
-  Object.entries(mailInfo).forEach(([key, title]) => {
+  Object.entries(mailInfo).forEach(([title, info]) => {
 
-      $('<div>')
-        .append($('<strong>').text(title)) // Bold title
-        .append($('<span>').text((key === 'recipients') ? mail[key].join(', ') : mail[key])) // Info tag
-        .appendTo(clickedMailContainer);
+    clickedMailContainer
+      .append(`<div>
+                <strong>${title}</strong>
+                <span>${info}</span>
+              </div>`)
   })
   
-  
-  clickedMailContainer.append(
-    ActionBox(mail),     // Attach actions box: Reply, Arhive buttons
-    $('<hr>'),           // Attach divide line 
-  );
+  clickedMailContainer
+    .append(
+      ActionBox(mail),  // Attach actions box: Reply, Arhive buttons
+      '<hr>',           // Attach divide line 
+    );
 
   // Reformat the body text
-  const passages = mail.body.split('\n');
-  passages.forEach( passage => {
+  mail.body.split('\n').forEach( passage => {
 
     // Create a title element for passage it starts with "On" and end with "wrote:"
-    if (passage.startsWith('On') && passage.endsWith('wrote: ')) {
-
-      // Boldify the timestamp info 
-      $('<h6>')
-        .text(passage)
-        .appendTo(clickedMailContainer);
-
-        // if the passage is empty, make it a break line
-    } else if (passage === '') {
-
-      $('<br>').appendTo(clickedMailContainer);
-      
-    } else {
-
-      // Create a paragraph element for passage
-      $('<p>')
-        .addClass('mb-0')
-        .text(passage)
-        .appendTo(clickedMailContainer);
-    }
+    if (passage.startsWith('On') && passage.endsWith('wrote: ')) 
+      clickedMailContainer.append(`<h6>${passage}</h6>`);
+    else if (passage === '') 
+      clickedMailContainer.append('<br>')
+    else 
+      clickedMailContainer.append(`<p class="mb-0">${passage}</p>`);
+    
 })
   // Clear the open mail view and append the opened mail container
   $('#open-mail-view')
-    .html("") 
+    .empty() 
     .append(clickedMailContainer);
 }
 
@@ -291,17 +262,14 @@ function ActionBox(mail) {
   // Create action buttons container for Reply and Archive buttons 
   const actionBox = $('<div>').addClass('d-flex');
 
-  // Create archive button
-  const archiveBtn = ArchiveBtn(mail.id, mail.archived);
-  
  
   // Reply button 
   // If current mailbox is sent, do not show reply button
   if ($('#emails-view').data('mailbox') === 'sent') {
 
     actionBox
-      .append(archiveBtn)
-      .addClass('justify-content-end');
+      .addClass('justify-content-end')
+      .append(ArchiveBtn(mail.id, mail.archived));
     return actionBox
   
   }
@@ -312,7 +280,7 @@ function ActionBox(mail) {
   replyBtn.addEventListener('click', () => replyToMail(mail));
 
   // Attach action buttons: Reply and archive 
-  actionBox.append(replyBtn, archiveBtn);
+  actionBox.append(replyBtn, ArchiveBtn(mail.id, mail.archived));
   actionBox.addClass('justify-content-between align-items-center');
 
   return actionBox
