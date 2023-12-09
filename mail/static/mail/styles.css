@@ -1,3 +1,5 @@
+
+/* Global */
 :root {
     font-family: Arial, Helvetica, sans-serif;
 }
@@ -5,143 +7,6 @@
 textarea {
     min-height: 400px;
 }
-
-@keyframes shrink {
-    0% {
-        opacity: 1;
-        font-size: 16px;
-        padding: 12px;
-        margin-bottom: 10px;
-
-    }
-
-    70% {
-        opacity: 1;
-        font-size: 16px;
-        padding: 12px;
-        margin-bottom: 10px;
-
-    }
-
-    80% {
-        opacity: 0;
-        font-size: 16px;
-        padding: 12px;
-        margin-bottom: 10px;
-    }
-
-    100% {
-        opacity: 0;
-        font-size: 0px;
-        padding: 0px;
-        margin-bottom: 0px;
-    }
-}
-
-.shrink {
-    animation-name: shrink;
-    animation-duration: 3s;
-    animation-fill-mode: forwards;
-}
-
-#archive-toggle {
-    width: 50px;
-    height: 50px;
-    text-align: center;
-    cursor: pointer;
-    border-radius: 100%;
-}
-
-#archive-toggle:hover {
-    background: #dadce0;
-}
-
-
-#logout {
-    transition: all 0.1s ease-in-out;
-    width: 80px;
-    height: 2rem;
-}
-
-#logout:hover {
-    color: rgb(250, 97, 97);
-    transform: scale(1.01);
-    font-weight: bolder;
-}
-
-/* Compose btn */
-#compose:hover {
-
-    /* Larger shadow at the bottom */
-    box-shadow: 0 0.252rem 1rem rgba(0, 0, 0, 0.15) !important;
-    transform: scale(1.01);
-}
-
-/* Nav btns */
-.nav-btn {
-    width: 15rem;
-    height: 3.5rem;
-    padding: 10px 0;
-    margin: 0px;
-
-    font-size: 1.125rem;
-
-    border-bottom: 5px solid rgba(152, 152, 152, 0.715);
-    cursor: pointer;
-    transition: all 0.1s ease-in-out;
-
-}
-
-.nav-btn:hover {
-    background-color: #ededeeba;
-}
-
-.nav-icon {
-    margin-right: 0.5rem;
-}
-
-.nav-icon::before {
-    transform: translateY(-1%);
-}
-
-
-.archive-icon::before {
-    transform: translateY(80%);
-}
-
-
-/* Utils */
-.active {
-    color: rgb(19, 122, 219);
-    font-weight: bold;
-    border-bottom: 5px solid rgb(19, 122, 219);
-}
-
-.small-text {
-    font-size: 0.75rem;
-}
-
-
-
-
-
-
-/* Email body Table style */
-
-tbody {
-    border-top: 1px solid #dadce0;
-}
-
-tr {
-    cursor: pointer;
-    border-bottom: 1px solid #dadce0;
-
-}
-
-tr:hover {
-    box-shadow: inset 1px 0 0 #dadce0, inset -1px 0 0 #dadce0, 0 1px 2px 0 rgba(60, 64, 67, .3), 0 1px 3px 1px rgba(60, 64, 67, .15);
-}
-
 
 /* Credential page */
 .credential-box {
@@ -203,6 +68,13 @@ tr:hover {
     
 }
 
+
+/* Compose form field */
+#compose-form .form-control:focus {
+    color: #212222;
+}
+
+
 /* Login or Register btn */
 .credential-btn {
     border-radius: 2rem;
@@ -220,3 +92,145 @@ tr:hover {
     font-weight: bolder;
     text-decoration: none;
 }
+
+
+
+/* Animation for message */
+@keyframes shrink {
+    0% {
+        opacity: 1;
+        font-size: 16px;
+        padding: 12px;
+        margin-bottom: 10px;
+
+    }
+
+    70% {
+        opacity: 1;
+        font-size: 16px;
+        padding: 12px;
+        margin-bottom: 10px;
+
+    }
+
+    80% {
+        opacity: 0;
+        font-size: 16px;
+        padding: 12px;
+        margin-bottom: 10px;
+    }
+
+    100% {
+        opacity: 0;
+        font-size: 0px;
+        padding: 0px;
+        margin-bottom: 0px;
+    }
+}
+
+.shrink {
+    animation-name: shrink;
+    animation-duration: 3s;
+    animation-fill-mode: forwards;
+}
+
+
+/* Logout button */
+#logout {
+    transition: all 0.1s ease-in-out;
+    width: 80px;
+    height: 2rem;
+}
+
+#logout:hover {
+    color: rgb(250, 97, 97);
+    transform: scale(1.01);
+    font-weight: bolder;
+}
+
+
+
+/* Compose btn */
+#compose:hover {
+
+    /* Larger shadow at the bottom */
+    box-shadow: 0 0.252rem 1rem rgba(0, 0, 0, 0.15) !important;
+    transform: scale(1.01);
+}
+
+
+/* Nav btns */
+.nav-btn {
+    width: 15rem;
+    height: 3.5rem;
+    padding: 10px 0;
+    margin: 0px;
+
+    font-size: 1.125rem;
+
+    border-bottom: 5px solid rgba(152, 152, 152, 0.715);
+    cursor: pointer;
+    transition: all 0.1s ease-in-out;
+
+}
+
+.nav-btn:hover {
+    background-color: #ededeeba;
+}
+
+.nav-icon {
+    margin-right: 0.5rem;
+}
+
+.nav-icon::before {
+    transform: translateY(-1%);
+}
+
+
+/* Email body Table style */
+
+tbody {
+    border-top: 1px solid #dadce0;
+}
+
+.mail-container {
+    cursor: pointer;
+    border-bottom: 1px solid #dadce0;
+
+}
+
+.mail-container:hover {
+    box-shadow: inset 1px 0 0 #dadce0, inset -1px 0 0 #dadce0, 0 1px 2px 0 rgba(60, 64, 67, .3), 0 1px 3px 1px rgba(60, 64, 67, .15);
+}
+
+
+
+/* Archive toggle css */
+#archive-toggle {
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 100%;
+}
+
+#archive-toggle:hover {
+    background: #dadce0;
+}
+
+.archive-icon::before {
+   padding-top: 1rem;
+}
+
+
+/* Utils */
+.active {
+    color: rgb(19, 122, 219);
+    font-weight: bold;
+    border-bottom: 5px solid rgb(19, 122, 219);
+}
+
+.small-text {
+    font-size: 0.75rem;
+}
+
