@@ -1,17 +1,17 @@
 document.addEventListener('DOMContentLoaded', function() {
 
   ['inbox', 'sent', 'archived'].forEach(id => {
-    document.getElementById(id).addEventListener('click', () => load_mailbox(id))
+    $(`#${id}`).on('click', () => load_mailbox(id))
   });
   
-  document.getElementById('compose').addEventListener('click', () => compose_email());
+  $('#compose').on('click', () => compose_email());
  
   // By default, load the inbox
   load_mailbox('inbox');
 
 });
 
-// Toggle email icon, apply active tag css, load the mailbox
+// Toggle email icon, apply active tag css, hide other mailbox views load the mailbox
 function load_mailbox(mailbox) {
 
   const emailIcon = $('<i>');
@@ -95,12 +95,13 @@ function displayMails(mails) {
 function createMailContainer(mail) {
 
   // Create mail container that display sender, subject, timestamp
-  const mailContainer = $('<div>')
-    .addClass('mail-container row px-3 py-3 align-items-center')
+  const mailContainer = $('<div class="mail-container row px-3 py-3 align-items-center"></div>')
     .attr('data-mailid', mail.id)
-    .append($('<span>').addClass('col-3').text(mail.sender))  // Sender
-    .append($('<span>').addClass('col-6').text(mail.subject)) // Subject
-    .append($('<span>').addClass('col-3 small-text text-end').text(mail.timestamp)); // Timestamp
+    .append(
+      $(`<span class="col-3">${mail.sender}</span>`), // Sender
+      $(`<span class="col-6">${mail.subject}</span>`), // Subject
+      $(`<span class="col-3 small-text text-end">${mail.timestamp}</span>`) // Timestamp
+    )  
 
   // Set the background color and font weight if the mail is read
   if (mail.read) 
@@ -113,13 +114,12 @@ function createMailContainer(mail) {
 
 function createAlertMessage(alertType, parentElement, message) {
   // Create a alert message element
-  const alertMessage = $('<div>')
-    .addClass(`alert ${alertType} rounded-0 shrink`)
-    .attr('role', 'alert')
-    .text(message)
-    .on('click', function() {
-      this.remove();
-    });
+  const alertMessage = $(`<div class="alert ${alertType} rounded-0 shrink" 
+                              role="alert">${message}</div>`);
+
+  alertMessage.on('click', function() {
+    this.remove();
+  });                       
 
   // Place it at the top of the view div
   parentElement.prepend(alertMessage);
@@ -132,7 +132,7 @@ function compose_email(recipient="", subject="", body="") {
   // Show compose view and hide other views
   $('#compose-view')
     .css('display', 'block')
-    .sblings().css('display', 'none');
+    .siblings().css('display', 'none');
 
   // Set the default values to empty string if it's not a reply mail
   $('#compose-recipients').val(recipient);
@@ -177,7 +177,6 @@ function post_compose(event) {
 }
 
 
-
 // Fetch the mail clicked from the backend
 function openMail(mailId) {
   
@@ -198,9 +197,6 @@ function openMail(mailId) {
         .siblings().css('display', 'none');
 
       displayMail(result);
-
-      // After archive toggle attached to document can it then activate the tooltip 
-      $(`#archive-toggle`).tooltip();
 
       if(!result.read)
         updateReadStatus(result);
@@ -254,13 +250,15 @@ function displayMail(mail) {
   $('#open-mail-view')
     .empty() 
     .append(clickedMailContainer);
+
+  
 }
 
 // Create action buttons container: Reply and Archive buttons
 function ActionBox(mail) {
   
   // Create action buttons container for Reply and Archive buttons 
-  const actionBox = $('<div>').addClass('d-flex');
+  const actionBox = $('<div class="d-flex mt-2"></div>');
 
  
   // Reply button 
@@ -274,14 +272,17 @@ function ActionBox(mail) {
   
   }
 
-  const replyBtn = document.createElement('button');
-  replyBtn.innerHTML = 'Reply';
-  replyBtn.className = 'btn btn-outline-primary';
-  replyBtn.addEventListener('click', () => replyToMail(mail));
-
+  const replyBtn = $(`<button class="btn btn-outline-dark rounded-0">
+                        <i class="bi bi-reply"></i>
+                        Reply
+                      </button>`)
+                      .on('click', () => replyToMail(mail));
+  
+ 
   // Attach action buttons: Reply and archive 
-  actionBox.append(replyBtn, ArchiveBtn(mail.id, mail.archived));
-  actionBox.addClass('justify-content-between align-items-center');
+  actionBox
+    .append(replyBtn, ArchiveBtn(mail.id, mail.archived))
+    .addClass('justify-content-between align-items-center');
 
   return actionBox
 }
@@ -290,79 +291,48 @@ function ActionBox(mail) {
 function ArchiveBtn(mailId, isArchived) {
 
   // Create archive button
-  const archiveBtn = document.createElement('div');
-  archiveBtn.id = 'archive-toggle';
-
-  let archiveAttrs = {'data-toggle': 'tooltip', 'data-mailid': mailId};
+  const archiveBtn = $(`<div id="archive-toggle"
+                            data-toggle="tooltip"
+                        ></div>`)
   
-  let archiveIcon;
+  setArchiveButtonState(archiveBtn, isArchived)
 
-  if (isArchived) {
-
-    archiveIcon = ArchiveIcon('bi bi-archive-fill archive-icon');
-
-    archiveAttrs['title'] = 'Unarchive';
-    archiveAttrs['data-archived'] = 'true';
-  }
-  else {
-
-    archiveIcon = ArchiveIcon('bi bi-archive archive-icon');
-
-    archiveAttrs['title'] = 'Archive';
-  }
-
-  Object.entries(archiveAttrs).forEach(([attr, value]) => {
-    archiveBtn.setAttribute(attr, value);
-  })
-  
-
-  // Attach to archive button
-  archiveBtn.append(archiveIcon);
-
-  // Set click event toggle logic between archive and unarhive
-  archiveBtn.addEventListener('click', function() {
-
-    let archiveIcon;
-    if (this.dataset.archived === 'true') {
-      
-      // Reset to not archived
-      archiveIcon = ArchiveIcon('bi bi-archive');
-      this.setAttribute('data-original-title', 'Archive');
-      this.dataset.archived = 'false';
-      isArchived = false;
-
-    } else {
-      
-      archiveIcon = ArchiveIcon('bi bi-archive-fill');
-      this.setAttribute('data-original-title', 'Unarchive');
-      this.dataset.archived = 'true';
-      isArchived = true;
-    }
-    
-    // Reset tooltip
-    $(`#${this.id}`).tooltip('hide').tooltip('show');
-
-    // Switch dislaying icon
-    this.replaceChild(archiveIcon, this.firstChild);
-
-    // update archive status
-    updateArchivedStatus(mailId, isArchived);
-
-    
-  } );
+  archiveBtn.on('click', () => toggleArchiveIcon(isArchived, mailId))
 
   return archiveBtn
 
 }
 
-function ArchiveIcon(className) {
+// Set click event toggle logic between archive and unarhive
+function toggleArchiveIcon(isArchived, mailId) {
 
-  const archiveIcon = document.createElement('i');
-  archiveIcon.className = className;
-
-  return archiveIcon
+  const archiveBtn = $('#archive-toggle').empty();
+  // Toggle icon and tooltip text
+  setArchiveButtonState(archiveBtn, !isArchived)
+  
+  // update archive status
+  updateArchivedStatus(mailId, !isArchived);
 
 }
+
+// Set archive icon and display tooltip
+function setArchiveButtonState(archiveBtn, isArchived) {
+
+  if (isArchived) {
+    archiveBtn
+      .html($('<i class="bi bi-archive-fill archive-icon"></i>'))
+      .attr('data-original-title', 'Unarchive');
+  }
+  else {
+    archiveBtn
+    .html($('<i class="bi bi-archive archive-icon"></i>'))
+      .attr('data-original-title', 'Archive');
+  }
+
+  // Activate tooltip
+  archiveBtn.tooltip('hide').tooltip('show');
+}
+
 
 
 // Update the clicked mail to read status if it is not read
@@ -399,12 +369,12 @@ function replyToMail(mail) {
   let body = `On ${mail.timestamp} ${mail.sender} wrote: \n\n${mail.body}`;
 
   compose_email(mail.sender, subject,  breakLine + body);
-  const composeView = document.getElementById('compose-body');
-
-  composeView.scrollIntoView({behavior: 'smooth', block: 'start'});
-  composeView.focus();
-  // move the cursor to the start of the text
-  composeView.setSelectionRange(0, 0);
+  
+  // Scroll to body and focus on it
+  const composeView = $('#compose-body')[0];
+  composeView.scrollIntoView({behavior: 'smooth', block: 'start'})
+  composeView.focus() 
+  composeView.setSelectionRange(0, 0); // Move the cursor to the start of the text
 
 
 }
