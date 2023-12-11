@@ -2,29 +2,33 @@
 {% load static %}
 
 {% block body %}
+<video autoplay muted loop id="mailbox-bg">
+    <source src="{% static 'mail/videos/mailbox_bg.mp4' %}" type="video/mp4">   
+</video>
 <!-- Header section -->
-<div class="container-fluid d-flex justify-content-between pt-3 px-lg-5">
+<div class="main-page container-fluid d-flex justify-content-between pt-3 px-lg-5">
     <!-- Container for email icon and compose button-->
-    <div id="mail-icon" class="d-flex align-items-center ">
-        <img class="gb_Kc" src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/logo_gmail_lockup_default_1x_r5.png"
-            srcset="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/logo_gmail_lockup_default_1x_r5.png 1x, https://ssl.gstatic.com/ui/v1/icons/mail/rfr/logo_gmail_lockup_default_2x_r5.png 2x "
-            alt="" aria-hidden="true" role="presentation" style="width:130px;height:50px">
-
-        <!-- compose btn -->
-        <a class="ml-4 btn d-flex align-items-center rounded-pill py-2 px-4 shadow-sm" id="compose">
-            <!-- compose icon -->
-            <svg height="18px" width="18px" style="enable-background:new 0 0 32 32;" version="1.1" viewBox="0 0 32 32"
-                xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                <g id="Layer_1" />
-                <g id="pen_x5F_alt_x5F_stroke">
-                    <path
-                        d="M29.656,2.344C28.094,0.781,26.047,0,24,0s-4.094,0.781-5.656,2.344L0.031,20.656L0,32h11.312   l18.344-18.344C32.781,10.531,32.781,5.469,29.656,2.344z M9.656,28H9.613c1.562-1.562,1.562-4.125,0-5.688   c-1.496-1.496-3.859-1.516-5.43-0.148L21.137,5.211l5.656,5.656L9.656,28z"
-                        style="fill:#4E4E50;" />
-                </g>
-            </svg>
-            <div class="ml-3 text-secondary "><strong>Compose</strong></div>
-        </a>
-    </div>
+        <div id="mail-icon" class="d-flex align-items-center ">
+            <img src="{% static 'mail/images/mail_i3.png' %}" alt="mail icon" width="50px">
+            <h3 class="mb-0 mt-1 text-dark " style="font-weight: bold;">SwiftSend</h3>
+            <!-- compose btn -->
+            <a class="ml-4 btn d-flex align-items-center rounded-pill py-2 px-4 shadow-sm" id="compose">
+                <!-- compose icon -->
+                <svg height="18px" width="18px" style="enable-background: new 0 0 32 32;" version="1.1" viewBox="0 0 32 32"
+                    xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                    <g id="Layer_1" />
+                    <g id="pen_x5F_alt_x5F_stroke">
+                        <path
+                            d="M29.656,2.344C28.094,0.781,26.047,0,24,0s-4.094,0.781-5.656,2.344L0.031,20.656L0,32h11.312   l18.344-18.344C32.781,10.531,32.781,5.469,29.656,2.344z M9.656,28H9.613c1.562-1.562,1.562-4.125,0-5.688   c-1.496-1.496-3.859-1.516-5.43-0.148L21.137,5.211l5.656,5.656L9.656,28z"
+                            style="fill:#4E4E50;" />
+                    </g>
+                </svg>
+                <div class="ml-3 pt-1 text-dark "><strong>Compose</strong></div>
+            </a>
+        </div>
+        
+        
+    
     <!-- Container for user info & logout -->
     <div class="d-flex align-items-center ">
         <strong>{{ request.user.email }}</strong>

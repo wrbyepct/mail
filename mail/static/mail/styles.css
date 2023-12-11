@@ -1,23 +1,59 @@
-
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700&family=Bonheur+Royale&family=Cormorant+Infant:ital,wght@0,300;0,400;1,300;1,500;1,600;1,700&display=swap');
 /* Global */
-:root {
-    font-family: Arial, Helvetica, sans-serif;
+body {
+    
+    font-family: 'Baloo 2', sans-serif;
 }
 
 textarea {
     min-height: 400px;
 }
 
+/* Background */
+#credential-bg{
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    z-index: -100;
+    min-width: 100%;
+    min-height: 100%;
+   
+    background-size: cover;
+    /* placed at the top */
+    background-position: center top;
+    opacity: 0.95;
+}
+
+#mailbox-bg {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    z-index: -100;
+    min-width: 100%;
+    min-height: 100%;
+   
+    background-size: cover;
+    /* placed at the top */
+    background-position: center top;
+    opacity: 0.6;
+}
+
+
+
 /* Credential page */
 .credential-box {
+    position: absolute;
+    z-index: 1;
+
     max-width: 30rem;
     min-width: 25rem;
-    height: 40rem;
+
     text-align: center;
 
     color: white;
 
-    background-color: rgba(11, 24, 45, 0.735);
+    background-color: rgba(49, 10, 57, 0.672);
+    mix-blend-mode: lighten;
     border-radius: 1rem;
     padding: 3rem 1rem;
 
@@ -52,7 +88,7 @@ textarea {
 }
 
 .form-control:focus {
-    color: #dadce0;
+    color: #ffffff;
     background: transparent;
     border: none;
     box-shadow: none;
@@ -71,7 +107,7 @@ textarea {
 
 /* Compose form field */
 #compose-form .form-control:focus {
-    color: #212222;
+    color: #000000;
 }
 
 
@@ -79,7 +115,20 @@ textarea {
 .credential-btn {
     border-radius: 2rem;
     padding: 1rem 1.25rem;
+    background-color: rgb(65, 34, 76);
+    color: white;
+    font-size: 1.25rem;
+    transition: all 0.2s ease-in-out;
+   
 }
+
+.credential-btn:hover {
+    border: 1px solid rgb(255, 255, 255);
+    transform: scale(1.1);
+    color: rgb(220, 181, 252);
+    font-weight: bolder;
+    
+} 
 
 /* Prompt for register or log in */
 .user-prompt {
@@ -186,29 +235,6 @@ textarea {
     transform: translateY(-1%);
 }
 
-/* Animation keyframe that moves from left to orgianl place,  Start quick but gradually slow at the end  */
-@keyframes move-in {
-    0% {
-        transform: translateX(-70%);
-        opacity: 0;
-    }
-
-    50% {
-        opacity: 0.3;
-    }
-
-    100% {
-        transform: translateX(0%);
-        opacity: 1;
-    }
-}
-
-.move-in {
-    animation-name: move-in;
-    animation-duration: 0.4s;
-    animation-timing-function: ease-in-out;
-    animation-fill-mode: forwards;
-}
 
 
 /* Email body Table style */
@@ -218,13 +244,9 @@ textarea {
     padding: 0 15px;
 }
 
-
-
-
-
 .mail-container {
     cursor: pointer;
-    border-bottom: 1px solid #dadce0;
+    
 
 }
 
@@ -261,5 +283,42 @@ textarea {
 
 .small-text {
     font-size: 0.75rem;
+}
+
+.read {
+    background-color: #a7bab77f;
+    border-bottom: 1px solid #dadce0;
+}
+
+.unread {
+    border: 2px solid rgb(43, 144, 142);
+    font-weight: 800;
+    border-radius: 5px;
+
+}
+
+
+/* Animation: mail moving in  */
+@keyframes move-in {
+    0% {
+        transform: translateX(-70%);
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 0.3;
+    }
+
+    100% {
+        transform: translateX(0%);
+        opacity: 1;
+    }
+}
+
+.move-in {
+    animation-name: move-in;
+    animation-duration: 0.4s;
+    animation-timing-function: ease-in-out;
+    animation-fill-mode: forwards;
 }
 

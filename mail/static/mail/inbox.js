@@ -36,7 +36,7 @@ function load_mailbox(mailbox) {
 
   // Set emails view title and set the mailbox data attribute
   $('#emails-view')
-    .html(`<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`)
+    .html(`<h3 id="${mailbox}-title">${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`)
     .data('mailbox', mailbox)
     .css('display', 'block')
     .siblings().css('display', 'none');
@@ -76,6 +76,14 @@ function displayMails(mails) {
     
     return
   }
+
+  // Count then number of unread mails
+  let unreadMails = 0;
+  mails.forEach(mail => {
+    if (!mail.read) unreadMails++;
+  })
+  // Update the inbox title with the number of unread mails
+  $('#inbox-title').text(`Inbox (${unreadMails})`);
   
   // Create mail container for each mail
   const mailsContainer = $('<div id="mails-container"></div>');
@@ -115,9 +123,9 @@ function createMailContainer(mail) {
 
   // Set the background color and font weight if the mail is read
   if (mail.read) 
-    mailContainer.css('background', '#f2f6fc');
+    mailContainer.addClass('read');
   else 
-    mailContainer.css('font-weight', 'bold');
+    mailContainer.addClass('unread');
 
   return mailContainer
 }
