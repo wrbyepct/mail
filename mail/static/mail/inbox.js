@@ -78,29 +78,39 @@ function displayMails(mails) {
   }
   
   // Create mail container for each mail
-  const emailsView = $('#emails-view');
+  const mailsContainer = $('<div id="mails-container"></div>');
+  $('#emails-view').append(mailsContainer);
+
+
+  let delay = 0;
   mails.forEach(mail => {
-
-    mailContainer = createMailContainer(mail)
-
+    const mailContainer = createMailContainer(mail)
     // Add mail clicking event listener to them
     mailContainer.on('click', () => openMail(mail.id));
 
-    emailsView.append(mailContainer);
+    // Append each mail container to the mails container every 50ms
+    setTimeout(() => {
 
+      mailsContainer.append(mailContainer);
+    }, delay += 50);
+    
   })
+
+  
+  
+  
 }
 
 // Create main container and fill in the values and styles
 function createMailContainer(mail) {
 
   // Create mail container that display sender, subject, timestamp
-  const mailContainer = $('<div class="mail-container row px-3 py-3 align-items-center"></div>')
+  const mailContainer = $('<div class="mail-container row px-0 py-3 align-items-center move-in"></div>')
     .attr('data-mailid', mail.id)
     .append(
       $(`<span class="col-3">${mail.sender}</span>`), // Sender
       $(`<span class="col-6">${mail.subject}</span>`), // Subject
-      $(`<span class="col-3 small-text text-end">${mail.timestamp}</span>`) // Timestamp
+      $(`<span class="col-3 small-text text-right">${mail.timestamp}</span>`) // Timestamp
     )  
 
   // Set the background color and font weight if the mail is read

@@ -186,8 +186,40 @@ textarea {
     transform: translateY(-1%);
 }
 
+/* Animation keyframe that moves from left to orgianl place,  Start quick but gradually slow at the end  */
+@keyframes move-in {
+    0% {
+        transform: translateX(-70%);
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 0.3;
+    }
+
+    100% {
+        transform: translateX(0%);
+        opacity: 1;
+    }
+}
+
+.move-in {
+    animation-name: move-in;
+    animation-duration: 0.4s;
+    animation-timing-function: ease-in-out;
+    animation-fill-mode: forwards;
+}
+
 
 /* Email body Table style */
+
+#mails-container {
+    border-top: 1px solid #dadce0;
+    padding: 0 15px;
+}
+
+
+
 
 
 .mail-container {
