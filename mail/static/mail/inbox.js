@@ -1,10 +1,19 @@
 document.addEventListener('DOMContentLoaded', function() {
+  // $(document).click(function (event) {
+  //   var clickover = $(event.target);
+  //   var _opened = $(".navbar-collapse").hasClass("show");
+  //   if (_opened === true && !clickover.hasClass("navbar-toggler")) {
+  //     $(".navbar-toggler").click();
+  //   }
+  // });
 
   ['inbox', 'sent', 'archived'].forEach(id => {
     $(`#${id}`).on('click', () => load_mailbox(id))
   });
-  
-  $('#compose').on('click', () => compose_email());
+
+  $('.compose-btn').each(function(){
+    $(this).on('click', function() { compose_email(); });
+  });
  
   // By default, load the inbox
   load_mailbox('inbox');

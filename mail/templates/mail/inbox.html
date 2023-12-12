@@ -6,14 +6,47 @@
     <source src="{% static 'mail/videos/mailbox_bg.mp4' %}" type="video/mp4">   
 </video>
 <!-- Header section -->
-<div class="main-page container-fluid d-flex justify-content-between pt-3 px-lg-5">
-    <!-- Container for email icon and compose button-->
-        <div id="mail-icon" class="d-flex align-items-center ">
-            <img src="{% static 'mail/images/mail_i3.png' %}" alt="mail icon" width="50px">
-            <h3 class="mb-0 mt-1 text-dark " style="font-weight: bold;">SwiftSend</h3>
-            <!-- compose btn -->
-            <a class="ml-4 btn d-flex align-items-center rounded-pill py-2 px-4 shadow-sm" id="compose">
-                <!-- compose icon -->
+<nav id="hamburger" class="navbar navbar-expand-md navbar-light ">
+    <div class="container-fluid justify-content-end">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse mt-2 mt-mg-0" id="navbarNav">
+            <ul class="navbar-nav ml-auto align-items-end align-items-md-center">
+                <li class="nav-item d-none d-md-block">
+                    <strong class="ml-3">{{ request.user.email }}</strong>
+                </li>
+                <li class="d-md-none">
+                    <a class="ml-4 btn d-flex align-items-center py-2 px-4 hamburger-btn compose-btn" id="compose">
+           
+                        <svg height="18px" width="18px" style="enable-background: new 0 0 32 32;" version="1.1" viewBox="0 0 32 32"
+                            xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                            <g id="Layer_1" />
+                            <g id="pen_x5F_alt_x5F_stroke">
+                                <path
+                                    d="M29.656,2.344C28.094,0.781,26.047,0,24,0s-4.094,0.781-5.656,2.344L0.031,20.656L0,32h11.312   l18.344-18.344C32.781,10.531,32.781,5.469,29.656,2.344z M9.656,28H9.613c1.562-1.562,1.562-4.125,0-5.688   c-1.496-1.496-3.859-1.516-5.43-0.148L21.137,5.211l5.656,5.656L9.656,28z"
+                                    style="fill:#4E4E50;" />
+                            </g>
+                        </svg>
+                        <div class="ml-3 pt-1 text-dark "><strong>Compose</strong></div>
+                    </a>
+                </li>
+                <li class="nav-item hamburger-btn ml-2">
+                    <a id="logout" class=" btn btn-sm" href="{% url 'logout' %}">Log Out</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="main-page container-fluid pt-3 px-lg-5 d-flex ">
+    
+    <div class="d-flex align-items-center" type="button">
+        <img id="mail-icon" src="{% static 'mail/images/mail_i3.png' %}" alt="mail icon" width="50px">
+        <h3 class="mb-0 mt-2 text-dark " style="font-weight: bold;">SwiftSend</h3>
+        <div class="d-none d-md-block ">
+            <a class="ml-4 btn d-flex align-items-center rounded-pill py-2 px-4 shadow-sm compose-btn" id="compose">
+           
                 <svg height="18px" width="18px" style="enable-background: new 0 0 32 32;" version="1.1" viewBox="0 0 32 32"
                     xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                     <g id="Layer_1" />
@@ -27,14 +60,59 @@
             </a>
         </div>
         
+    </div> 
         
     
+
+    <!-- Container for email icon and compose button-->
+    <!-- <div class="d-flex align-items-center ">
+        <div class="d-flex align-items-center" type="button">
+            <img id="mail-icon" src="{% static 'mail/images/mail_i3.png' %}" alt="mail icon" width="50px">
+            <h3 class="mb-0 mt-2 text-dark " style="font-weight: bold;">SwiftSend</h3>
+        </div> 
+        
+        
+        <a class="ml-4 btn d-flex align-items-center rounded-pill py-2 px-4 shadow-sm" id="compose">
+           
+            <svg height="18px" width="18px" style="enable-background: new 0 0 32 32;" version="1.1" viewBox="0 0 32 32"
+                xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <g id="Layer_1" />
+                <g id="pen_x5F_alt_x5F_stroke">
+                    <path
+                        d="M29.656,2.344C28.094,0.781,26.047,0,24,0s-4.094,0.781-5.656,2.344L0.031,20.656L0,32h11.312   l18.344-18.344C32.781,10.531,32.781,5.469,29.656,2.344z M9.656,28H9.613c1.562-1.562,1.562-4.125,0-5.688   c-1.496-1.496-3.859-1.516-5.43-0.148L21.137,5.211l5.656,5.656L9.656,28z"
+                        style="fill:#4E4E50;" />
+                </g>
+            </svg>
+            <div class="ml-3 pt-1 text-dark "><strong>Compose</strong></div>
+        </a>
+    </div> -->
+    
     <!-- Container for user info & logout -->
-    <div class="d-flex align-items-center ">
+    <!-- <div class="d-flex align-items-center d-none d-md-block">
         <strong>{{ request.user.email }}</strong>
         <a id="logout" class="ml-3 btn btn-sm" href="{% url 'logout' %}">Log Out</a>
-    </div>
+    </div> -->
+    <!--Navbar-->
+    <!-- <nav class="navbar navbar-expand-lg navbar-light bg-light position-absolute top-0 end-0 ">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse " id="navbarText">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+            <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link" href="#">Features</a>
+            </li>
+        </ul>
+        </div>
+    </nav> -->
+    
 </div>
+
+
+
 <hr>
 
 <!-- Nav bar buttons -->
