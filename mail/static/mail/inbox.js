@@ -1,28 +1,73 @@
-document.addEventListener('DOMContentLoaded', function() {
-  // $(document).click(function (event) {
-  //   var clickover = $(event.target);
-  //   var _opened = $(".navbar-collapse").hasClass("show");
-  //   if (_opened === true && !clickover.hasClass("navbar-toggler")) {
-  //     $(".navbar-toggler").click();
-  //   }
-  // });
+let currentMailbox = 'inbox';
 
-  ['inbox', 'sent', 'archived'].forEach(id => {
-    $(`#${id}`).on('click', () => load_mailbox(id))
+// Pop back to previous page when click back button
+$(window).on('popstate', function(event) {
+
+  let previousPage = event.originalEvent.state.page;
+  
+  if (previousPage === 'compose') {
+
+    compose_email();
+
+  } else if (previousPage === 'reply') {
+
+    const mail = event.originalEvent.state.mail;
+    replyToMail(mail);
+    
+  } else if (previousPage === 'mail') {
+
+    const mailId = event.originalEvent.state.mailid;
+
+    // Restore the previous mailbox where the user was in
+    const mailbox = event.originalEvent.state.mailbox;
+    console.log(`Restore mailbox: ${mailbox}`);
+    currentMailbox = mailbox
+    openMail(mailId);
+  } else {
+    // Other mailbox pages: Inbox, Sent, Archived
+    load_mailbox(previousPage);
+    
+  }
+});
+
+
+$(document).ready(function() {
+  
+  // Hide menu when click outside of it
+  $(document).click(function () {
+    let hamburgerExpanded = $("#navbarNav").hasClass("show");
+    if (hamburgerExpanded) {
+      $("#navbarNav").removeClass("show");
+    }
   });
 
+  ['inbox', 'sent', 'archived'].forEach(id => {
+    $(`#${id}`).on('click', () => {
+      load_mailbox(id);
+      history.pushState({page: id}, "", `/`);
+    });
+    
+  });
+
+  // Compose button
   $('.compose-btn').each(function(){
-    $(this).on('click', function() { compose_email(); });
+    
+    $(this).on('click', function() { 
+      compose_email(); 
+      history.pushState({page: 'compose'}, "", '/');
+    });
+   
   });
  
   // By default, load the inbox
   load_mailbox('inbox');
+  history.pushState({page: 'inbox'}, "", "/");
 
 });
 
 // Toggle email icon, apply active tag css, hide other mailbox views load the mailbox
 function load_mailbox(mailbox) {
-
+  
   const emailIcon = $('<i>');
 
   // Toggle the email icon when in different mailbox
@@ -46,13 +91,13 @@ function load_mailbox(mailbox) {
   // Set emails view title and set the mailbox data attribute
   $('#emails-view')
     .html(`<h3 id="${mailbox}-title">${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`)
-    .data('mailbox', mailbox)
     .css('display', 'block')
     .siblings().css('display', 'none');
     
 
   // Get mails from backend and display them
   getMailsFromBackendAndDisplayThem(mailbox);
+  currentMailbox = mailbox;
 
 }
 
@@ -102,8 +147,18 @@ function displayMails(mails) {
   let delay = 0;
   mails.forEach(mail => {
     const mailContainer = createMailContainer(mail)
+
     // Add mail clicking event listener to them
-    mailContainer.on('click', () => openMail(mail.id));
+    mailContainer.on('click', () => {
+
+      openMail(mail.id);
+
+      history.pushState({
+        page: 'mail', 
+        mailid: mail.id,
+        mailbox: currentMailbox
+      }, "", '/');
+    });
 
     // Append each mail container to the mails container every 50ms
     setTimeout(() => {
@@ -218,11 +273,6 @@ function openMail(mailId) {
 
     } else {
 
-      // Hide the other views and show open mail view 
-      $('#open-mail-view')
-        .css('display', 'block')
-        .siblings().css('display', 'none');
-
       displayMail(result);
 
       if(!result.read)
@@ -234,6 +284,12 @@ function openMail(mailId) {
 
 // Display the clicked mail
 function displayMail(mail) {
+
+  // Hide the other views and show open mail view 
+  $('#open-mail-view')
+  .css('display', 'block')
+  .siblings().css('display', 'none');
+
 
   const clickedMailContainer = $(`<div class="p-3 border border-dark" 
                                       data-mailid="${mail.id}">`);
@@ -287,11 +343,10 @@ function ActionBox(mail) {
   // Create action buttons container for Reply and Archive buttons 
   const actionBox = $('<div class="d-flex mt-2"></div>');
 
- 
   // Reply button 
   // If current mailbox is sent, do not show reply button
-  if ($('#emails-view').data('mailbox') === 'sent') {
-
+  if (currentMailbox === 'sent') {
+    
     actionBox
       .addClass('justify-content-end')
       .append(ArchiveBtn(mail.id, mail.archived));
@@ -303,7 +358,10 @@ function ActionBox(mail) {
                         <i class="bi bi-reply"></i>
                         Reply
                       </button>`)
-                      .on('click', () => replyToMail(mail));
+                      .on('click', () => {
+                        replyToMail(mail);
+                        history.pushState({page: 'reply', mail: mail}, "", '/');
+                      });
   
  
   // Attach action buttons: Reply and archive 

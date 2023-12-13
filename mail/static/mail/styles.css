@@ -204,14 +204,19 @@ textarea {
     font-weight: bolder;
 }
 
+/* Style for hamburger when under medium screen */
+@media (max-width: 767px) {
+    .hamburger-menu {
+        background: #c2e1eee9;
+    }
+    #hamburger {
+        width: 13.25rem;
+    }
+}
 
-
-/* Compose btn */
-.hamburger-btn:hover {
-
-    /* Larger shadow at the bottom */
-    box-shadow: 0 0.252rem 1rem rgba(0, 0, 0, 0.15) !important;
-    transform: scale(1.01);
+.hamburger-btn {
+    font-size: 1.125rem;
+    padding: 0.875rem 1rem;
 }
 
 #hamburger {
@@ -219,15 +224,18 @@ textarea {
     right: 0;
     top: 0.5rem;
     z-index: 100;
+    
 }
 
+
+
+/* Nav*/
 .nav-bar {
     flex-basis: 36rem;
     max-width: 45rem;
     flex-grow: 1;
 }
 
-/* Nav btns */
 .nav-btn {
     max-width: 15rem;
     flex-grow: 1;
@@ -318,6 +326,14 @@ textarea {
 
 }
 
+
+/* Hover shadow effect for btns */
+.shadow-hover:hover {
+
+    /* Larger shadow at the bottom */
+    box-shadow: 0 0.252rem 1rem rgba(0, 0, 0, 0.15) !important;
+    transform: scale(1.01);
+}
 
 /* Animation: mail moving in  */
 @keyframes move-in {
