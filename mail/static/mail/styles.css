@@ -319,13 +319,17 @@ textarea {
 }
 
 .unread {
-    border: 2px solid rgb(43, 144, 142);
+    border: 1px solid rgb(43, 144, 142);
     font-weight: 800;
     border-radius: 5px;
-    font-size: 1.125rem;
 
 }
 
+.error-red {
+    color: #f58a8a;
+    font-weight: bold;
+    font-size: 1.125rem;
+}
 
 /* Hover shadow effect for btns */
 .shadow-hover:hover {

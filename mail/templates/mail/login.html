@@ -7,9 +7,6 @@
 
 {% block body %}
 
-{% if message %}
-    <div>{{ message }}</div>
-{% endif %}
 
 <div class="container-fluid vh-100 d-flex flex-column justify-content-center align-items-center ">
     <video autoplay muted loop id="credential-bg">
@@ -26,7 +23,7 @@
 
         <!-- error-message -->
         {% if message %}
-            <div class="text-danger" >{{ message }}</div>
+            <div class="error-red" >{{ message }}</div>
         {% endif %}
 
         <!-- login form -->

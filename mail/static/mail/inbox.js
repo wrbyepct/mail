@@ -3,7 +3,7 @@ let currentMailbox = 'inbox';
 // Pop back to previous page when click back button
 $(window).on('popstate', function(event) {
 
-  let previousPage = event.originalEvent.state.page;
+  const previousPage = event.originalEvent.state.page;
   
   if (previousPage === 'compose') {
 
@@ -20,7 +20,6 @@ $(window).on('popstate', function(event) {
 
     // Restore the previous mailbox where the user was in
     const mailbox = event.originalEvent.state.mailbox;
-    console.log(`Restore mailbox: ${mailbox}`);
     currentMailbox = mailbox
     openMail(mailId);
   } else {
@@ -41,6 +40,7 @@ $(document).ready(function() {
     }
   });
 
+  // Mailbox click event
   ['inbox', 'sent', 'archived'].forEach(id => {
     $(`#${id}`).on('click', () => {
       load_mailbox(id);
@@ -49,7 +49,7 @@ $(document).ready(function() {
     
   });
 
-  // Compose button
+  // Compose btn click event
   $('.compose-btn').each(function(){
     
     $(this).on('click', function() { 
@@ -58,6 +58,8 @@ $(document).ready(function() {
     });
    
   });
+
+  $('#submit-compose').on('click', (event) => post_compose(event));
  
   // By default, load the inbox
   load_mailbox('inbox');
@@ -180,8 +182,8 @@ function createMailContainer(mail) {
   const mailContainer = $('<div class="mail-container row px-0 py-3 align-items-center move-in"></div>')
     .attr('data-mailid', mail.id)
     .append(
-      $(`<span class="col-3">${mail.sender}</span>`), // Sender
-      $(`<span class="col-6">${mail.subject}</span>`), // Subject
+      $(`<span class="col-4">${mail.sender}</span>`), // Sender
+      $(`<span class="col-5">${mail.subject}</span>`), // Subject
       $(`<span class="col-3 small-text text-right">${mail.timestamp}</span>`) // Timestamp
     )  
 
@@ -221,12 +223,10 @@ function compose_email(recipient="", subject="", body="") {
   $('#compose-subject').val(subject);
   $('#compose-body').val(body);
 
-  // Listen to submit compose event
-  $('#submit-compose').on('click', (event) => post_compose(event));
 }
 
 function post_compose(event) {
-
+ 
   // Prevent refresh default behaviour
   event.preventDefault();
 
@@ -443,7 +443,7 @@ function updateReadStatus(mail) {
 // Reply button logic
 function replyToMail(mail) {
 
-  // Fill in the compose form with mail info
+  // Open compose view and fill the info
   let subject = mail.subject; 
   if(mail.subject.startsWith('Re: ')) 
     subject = mail.subject;
