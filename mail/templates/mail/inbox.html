@@ -23,7 +23,7 @@
             <ul class="navbar-nav ml-auto align-items-end align-items-md-center ">
 
                 <!-- User Name -->
-                <li class="nav-item d-none d-md-block">
+                <li class="nav-item d-none d-md-block mr-2">
                     <strong class="ml-3">{{ request.user.email }}</strong>
                 </li>
                 
@@ -52,7 +52,7 @@
 <!-- Header: Logo & Compose button -->
 <div class="main-page container-fluid pt-3 px-lg-5 d-flex ">
     
-    <div class="d-flex align-items-center" type="button">
+    <a class="d-flex align-items-center text-decoration-none" href="{% url 'index' %}">
         <!-- Logo -->
         <img id="mail-icon" src="{% static 'mail/images/mail_i3.png' %}" alt="mail icon" width="50px">
         <h3 class="mb-0 mt-2 text-dark " style="font-weight: bold;">SwiftSend</h3>
@@ -60,7 +60,7 @@
         <!-- Compose Button -->
         <div class="d-none d-md-block ">
             <a class="ml-4 btn d-flex align-items-center rounded-pill py-2 px-4 shadow-sm shadow-hover compose-btn" id="compose">
-           
+            
                 <svg height="18px" width="18px" style="enable-background: new 0 0 32 32;" version="1.1" viewBox="0 0 32 32"
                     xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                     <g id="Layer_1" />
@@ -74,7 +74,8 @@
             </a>
         </div>
         
-    </div> 
+    </a>
+    
         
     
 </div>
